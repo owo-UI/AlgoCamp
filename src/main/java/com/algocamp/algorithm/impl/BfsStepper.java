@@ -180,7 +180,9 @@ private StepState buildStepState(int stepNumber,
             currentVertex,
             new ArrayList<>(processedVertices),
             snapshotQueue(queue),
-            Collections.emptyList(),   // BFS 不使用栈，传空列表
+            Collections.emptyList(),   // DFS 栈
+            Collections.emptyMap(),    // Dijkstra 距离表
+            Collections.emptyList(),   // Dijkstra 优先队列
             finished
     );
 }

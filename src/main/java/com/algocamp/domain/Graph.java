@@ -24,7 +24,7 @@ public class Graph {
      * 邻接表：key 为节点 ID，value 为该节点的所有邻居节点 ID 列表。
      * 使用 HashMap 保证 O(1) 查找节点，邻居列表保持插入顺序便于展示。
      */
-    private final Map<String, List<String>> adjacencyList;
+    private final Map<String, List<WeightedEdge>> adjacencyList;
 
     /**
      * 是否为有向图。
@@ -32,6 +32,11 @@ public class Graph {
      * false：边 A—B 双向记录。
      */
     private final boolean directed;
+
+    /**
+     * 无权边的默认权重（用于 BFS、DFS 等算法）。
+     */
+    private static final int DEFAULT_EDGE_WEIGHT = 1;
 
     /**
      * 构造一个空图。
@@ -56,24 +61,35 @@ public class Graph {
     }
 
     /**
-     * 向图中添加一条边。
-     * 若端点不存在，会自动创建节点。
+     * 向图中添加一条无权边（默认权重为 1）。
+     * 供 BFS、DFS 等无权图算法使用。
      *
      * @param from 起点节点 ID
      * @param to   终点节点 ID
-     * @throws IllegalArgumentException 若任一端点 ID 无效
      */
     public void addEdge(String from, String to) {
+        addWeightedEdge(from, to, DEFAULT_EDGE_WEIGHT);
+    }
+
+    /**
+     * 向图中添加一条带权边。
+     * 若端点不存在，会自动创建节点。
+     *
+     * @param from   起点节点 ID
+     * @param to     终点节点 ID
+     * @param weight 边权重，必须大于 0
+     * @throws IllegalArgumentException 若参数无效或权重 ≤ 0
+     */
+    public void addWeightedEdge(String from, String to, int weight) {
         validateVertexId(from);
         validateVertexId(to);
         addVertex(from);
         addVertex(to);
-        adjacencyList.get(from).add(to);
+        adjacencyList.get(from).add(new WeightedEdge(to, weight));
         if (!directed) {
-            adjacencyList.get(to).add(from);
+            adjacencyList.get(to).add(new WeightedEdge(from, weight));
         }
     }
-
     /**
      * 获取指定节点的所有邻居节点 ID。
      * 返回不可变列表，调用方无法修改内部邻接表。
@@ -83,11 +99,52 @@ public class Graph {
      */
     public List<String> getNeighbors(String vertexId) {
         validateVertexId(vertexId);
-        List<String> neighbors = adjacencyList.get(vertexId);
-        if (neighbors == null) {
+        List<WeightedEdge> edges = adjacencyList.get(vertexId);
+        if (edges == null) {
             return Collections.emptyList();
         }
+        List<String> neighbors = new ArrayList<>();
+        for (WeightedEdge edge : edges) {
+            neighbors.add(edge.getTo());
+        }
         return Collections.unmodifiableList(neighbors);
+    }
+
+    /**
+     * 获取指定节点的所有带权出边。
+     *
+     * @param vertexId 节点 ID
+     * @return 不可变的带权边列表；若节点不存在则返回空列表
+     */
+    public List<WeightedEdge> getWeightedNeighbors(String vertexId) {
+        validateVertexId(vertexId);
+        List<WeightedEdge> edges = adjacencyList.get(vertexId);
+        if (edges == null) {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(new ArrayList<>(edges));
+    }
+
+    /**
+     * 获取两点之间的边权重。
+     *
+     * @param from 起点节点 ID
+     * @param to   终点节点 ID
+     * @return 边权重；若边不存在则返回 -1
+     */
+    public int getEdgeWeight(String from, String to) {
+        validateVertexId(from);
+        validateVertexId(to);
+        List<WeightedEdge> edges = adjacencyList.get(from);
+        if (edges == null) {
+            return -1;
+        }
+        for (WeightedEdge edge : edges) {
+            if (edge.getTo().equals(to)) {
+                return edge.getWeight();
+            }
+        }
+        return -1;
     }
 
     /**
@@ -138,8 +195,12 @@ public class Graph {
      */
     public Map<String, List<String>> getAdjacencyListSnapshot() {
         Map<String, List<String>> snapshot = new HashMap<>();
-        for (Map.Entry<String, List<String>> entry : adjacencyList.entrySet()) {
-            snapshot.put(entry.getKey(), Collections.unmodifiableList(new ArrayList<>(entry.getValue())));
+        for (Map.Entry<String, List<WeightedEdge>> entry : adjacencyList.entrySet()) {
+            List<String> neighbors = new ArrayList<>();
+            for (WeightedEdge edge : entry.getValue()) {
+                neighbors.add(edge.getTo());
+            }
+            snapshot.put(entry.getKey(), Collections.unmodifiableList(neighbors));
         }
         return Collections.unmodifiableMap(snapshot);
     }
@@ -158,18 +219,21 @@ public class Graph {
 
 
 
-    /**
-     * 测试的main函数
-     * @param args
-     */
-/*     public static void main(String[] args) {
-        Graph graph = new Graph(false);
-        graph.addEdge("A", "B");
-        graph.addEdge("A", "C");
-        graph.addEdge("B", "D");
-        System.out.println(graph.getVertices());
-        System.out.println(graph.getNeighbors("A"));
-        System.out.println(graph.getAdjacencyListSnapshot());
-    } */
+//    /**
+//     * 测试的main函数
+//     * @param args
+//     */
+//     public static void main(String[] args) {
+//         Graph graph = new Graph(false);
+//         graph.addWeightedEdge("A", "B", 4);
+//         graph.addWeightedEdge("A", "C", 2);
+//         graph.addWeightedEdge("B", "D", 5);
+//         graph.addEdge("C", "D");  // 默认权重 1
+//
+//         System.out.println(graph.getNeighbors("A"));              // [B, C]
+//         System.out.println(graph.getWeightedNeighbors("A"));      // [B(4), C(2)]
+//         System.out.println(graph.getEdgeWeight("A", "B"));          // 4
+//         System.out.println(graph.getEdgeWeight("C", "D"));          // 1
+//    }
 
 }

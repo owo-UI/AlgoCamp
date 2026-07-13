@@ -4,16 +4,20 @@ package com.algocamp.domain;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * 图算法步进执行时，某一步的完整内部状态快照。
  * <p>
- * 用于算法工坊的前端步进可视化：前端根据本对象渲染
- * 「当前节点」「已访问节点」「BFS 队列」或「DFS 栈」等信息。
- * BFS 使用 {@link #queueContents}，DFS 使用 {@link #stackContents}，未使用的字段为空列表。
+ * 不同算法使用不同字段：
+ * <ul>
+ *   <li>BFS — {@link #queueContents}</li>
+ *   <li>DFS — {@link #stackContents}</li>
+ *   <li>Dijkstra — {@link #distances} + {@link #priorityQueueContents}</li>
+ * </ul>
+ * 未使用的字段为空列表或空 Map。
  * </p>
- *
- * @author AlgoCamp
  */
 public class StepState {
 
@@ -52,25 +56,50 @@ public class StepState {
 
     /**
      * 构造一步的完整状态快照。
-     * @param stepNumber      步序号，从 0 开始
-     * @param currentVertex   当前节点 ID，可为 null
-     * @param visitedVertices 已访问节点列表，可为 null（视为空列表）
-     * @param queueContents   BFS 队列内容，可为 null（视为空列表）
-     * @param stackContents   DFS 栈内容，可 为 null（视为空列表）
-     * @param finished        是否为结束步
+     *
+     * @param stepNumber             步序号，从 0 开始
+     * @param currentVertex          当前节点 ID，可为 null
+     * @param visitedVertices        已访问节点列表，可为 null
+     * @param queueContents          BFS 队列内容，可为 null
+     * @param stackContents          DFS 栈内容，可为 null
+     * @param distances              Dijkstra 距离表，可为 null
+     * @param priorityQueueContents  Dijkstra 优先队列内容，可为 null
+     * @param finished               是否为结束步
      */
     public StepState(int stepNumber,
-                 String currentVertex,
-                 List<String> visitedVertices,
-                 List<String> queueContents,
-                 List<String> stackContents,
-                 boolean finished) {
+                     String currentVertex,
+                     List<String> visitedVertices,
+                     List<String> queueContents,
+                     List<String> stackContents,
+                     Map<String, Integer> distances,
+                     List<String> priorityQueueContents,
+                     boolean finished) {
         this.stepNumber = stepNumber;
         this.currentVertex = currentVertex;
         this.visitedVertices = copyToUnmodifiableList(visitedVertices);
         this.queueContents = copyToUnmodifiableList(queueContents);
         this.stackContents = copyToUnmodifiableList(stackContents);
+        this.distances = copyToUnmodifiableMap(distances);
+        this.priorityQueueContents = copyToUnmodifiableList(priorityQueueContents);
         this.finished = finished;
+    }
+
+    /**
+     * 获取 Dijkstra 距离表快照。
+     *
+     * @return 不可变的距离映射（节点 ID → 最短距离）
+     */
+    public Map<String, Integer> getDistances() {
+        return distances;
+    }
+
+    /**
+     * 获取 Dijkstra 优先队列快照（距离小的在前）。
+     *
+     * @return 不可变的优先队列节点列表
+     */
+    public List<String> getPriorityQueueContents() {
+        return priorityQueueContents;
     }
 
     /**
@@ -118,6 +147,21 @@ public class StepState {
     }
 
     /**
+     * Dijkstra 算法中，各节点截至本步的已知最短距离。
+     * key 为节点 ID，value 为距离值。
+     * BFS、DFS 不使用本字段，值为空 Map。
+     */
+    private final Map<String, Integer> distances;
+
+    /**
+     * Dijkstra 优先队列在本步的快照，按距离从小到大排列。
+     * 列表元素为节点 ID，距离可通过 {@link #distances} 查询。
+     * BFS、DFS 不使用本字段，值为空列表。
+     */
+    private final List<String> priorityQueueContents;
+
+
+    /**
      * 判断本步是否为算法的最后一步。
      *
      * @return 已结束返回 true，否则 false
@@ -139,6 +183,19 @@ public class StepState {
         return Collections.unmodifiableList(new ArrayList<>(source));
     }
 
+    /**
+     * 将传入 Map 拷贝为不可变 Map，防止外部修改内部状态。
+     *
+     * @param source 源 Map，可为 null
+     * @return 不可变 Map 副本；source 为 null 时返回空 Map
+     */
+    private static Map<String, Integer> copyToUnmodifiableMap(Map<String, Integer> source) {
+        if (source == null) {
+            return Collections.emptyMap();
+        }
+        return Collections.unmodifiableMap(new HashMap<>(source));
+    }
+
     @Override
     public String toString() {
         return "StepState{"
@@ -147,7 +204,11 @@ public class StepState {
                 + ", visitedVertices=" + visitedVertices
                 + ", queueContents=" + queueContents
                 + ", stackContents=" + stackContents
+                + ", distances=" + distances
+                + ", priorityQueueContents=" + priorityQueueContents
                 + ", finished=" + finished
                 + '}';
     }
 }
+
+

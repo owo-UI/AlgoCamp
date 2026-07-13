@@ -115,10 +115,15 @@ public class GraphAlgorithmRequest {
     }
 
     /**
+     * 默认边权重，当 EdgeRequest 未指定 weight 时使用。
+     */
+    private static final int DEFAULT_EDGE_WEIGHT = 1;
+
+    /**
      * 将本请求对象转换为 domain 层的 {@link Graph} 对象。
      * <p>
-     * 遍历边列表，依次调用 {@link Graph#addEdge} 构建邻接表。
-     * 若边列表为 null 或为空，则返回仅含节点（或无节点）的空图。
+     * 遍历边列表，调用 {@link Graph#addWeightedEdge} 构建带权邻接表。
+     * 若边的 weight 未设置，则使用默认权重 1。
      * </p>
      *
      * @return 构建好的 Graph 对象
@@ -130,7 +135,11 @@ public class GraphAlgorithmRequest {
         }
         for (EdgeRequest edge : edges) {
             if (edge != null && edge.getFrom() != null && edge.getTo() != null) {
-                graph.addEdge(edge.getFrom(), edge.getTo());
+                graph.addWeightedEdge(
+                        edge.getFrom(),
+                        edge.getTo(),
+                        edge.getEffectiveWeight()
+                );
             }
         }
         return graph;

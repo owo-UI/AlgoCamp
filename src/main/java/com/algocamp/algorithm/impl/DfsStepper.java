@@ -173,8 +173,10 @@ private StepState buildStepState(int stepNumber,
             stepNumber,
             currentVertex,
             new ArrayList<>(processedVertices),
-            Collections.emptyList(),   // DFS 不使用队列，传空列表
+            Collections.emptyList(),   // BFS 队列
             snapshotStack(stack),
+            Collections.emptyMap(),    // Dijkstra 距离表
+            Collections.emptyList(),   // Dijkstra 优先队列
             finished
     );
 }
