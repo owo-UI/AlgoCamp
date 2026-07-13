@@ -15,6 +15,7 @@ import java.util.HashMap;
  *   <li>BFS — {@link #queueContents}</li>
  *   <li>DFS — {@link #stackContents}</li>
  *   <li>Dijkstra — {@link #distances} + {@link #priorityQueueContents}</li>
+ *   <li>拓扑排序 — {@link #inDegrees} + {@link #queueContents}</li>
  * </ul>
  * 未使用的字段为空列表或空 Map。
  * </p>
@@ -64,6 +65,7 @@ public class StepState {
      * @param stackContents          DFS 栈内容，可为 null
      * @param distances              Dijkstra 距离表，可为 null
      * @param priorityQueueContents  Dijkstra 优先队列内容，可为 null
+     * @param inDegrees              拓扑排序入度表，可为 null
      * @param finished               是否为结束步
      */
     public StepState(int stepNumber,
@@ -73,6 +75,7 @@ public class StepState {
                      List<String> stackContents,
                      Map<String, Integer> distances,
                      List<String> priorityQueueContents,
+                     Map<String, Integer> inDegrees,
                      boolean finished) {
         this.stepNumber = stepNumber;
         this.currentVertex = currentVertex;
@@ -81,6 +84,7 @@ public class StepState {
         this.stackContents = copyToUnmodifiableList(stackContents);
         this.distances = copyToUnmodifiableMap(distances);
         this.priorityQueueContents = copyToUnmodifiableList(priorityQueueContents);
+        this.inDegrees = copyToUnmodifiableMap(inDegrees);
         this.finished = finished;
     }
 
@@ -147,6 +151,15 @@ public class StepState {
     }
 
     /**
+     * 获取拓扑排序入度表快照。
+     *
+     * @return 不可变的入度映射（节点 ID → 入度）
+     */
+    public Map<String, Integer> getInDegrees() {
+        return inDegrees;
+    }
+
+    /**
      * Dijkstra 算法中，各节点截至本步的已知最短距离。
      * key 为节点 ID，value 为距离值。
      * BFS、DFS 不使用本字段，值为空 Map。
@@ -160,6 +173,13 @@ public class StepState {
      */
     private final List<String> priorityQueueContents;
 
+
+    /**
+     * 拓扑排序中，各节点截至本步的入度。
+     * key 为节点 ID，value 为入度值。
+     * 其他算法不使用本字段，值为空 Map。
+     */
+    private final Map<String, Integer> inDegrees;
 
     /**
      * 判断本步是否为算法的最后一步。
@@ -206,6 +226,7 @@ public class StepState {
                 + ", stackContents=" + stackContents
                 + ", distances=" + distances
                 + ", priorityQueueContents=" + priorityQueueContents
+                + ", inDegrees=" + inDegrees
                 + ", finished=" + finished
                 + '}';
     }

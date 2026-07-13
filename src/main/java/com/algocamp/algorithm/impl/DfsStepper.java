@@ -177,6 +177,7 @@ private StepState buildStepState(int stepNumber,
             snapshotStack(stack),
             Collections.emptyMap(),    // Dijkstra 距离表
             Collections.emptyList(),   // Dijkstra 优先队列
+            Collections.emptyMap(),    // 拓扑排序入度表
             finished
     );
 }

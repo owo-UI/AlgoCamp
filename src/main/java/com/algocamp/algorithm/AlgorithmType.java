@@ -19,7 +19,10 @@ public enum AlgorithmType {
     DFS("DFS", "深度优先搜索"),
 
     /** Dijkstra 最短路径 —— 预留，后续实现 */
-    DIJKSTRA("DIJKSTRA", "Dijkstra 最短路径");
+    DIJKSTRA("DIJKSTRA", "Dijkstra 最短路径"),
+
+    /** 拓扑排序（Topological Sort），仅适用于有向无环图 */
+    TOPOLOGICAL_SORT("TOPOLOGICAL_SORT", "拓扑排序");
 
     /**
      * 算法代码，用于 API 传参（如 ?algorithm=BFS）。

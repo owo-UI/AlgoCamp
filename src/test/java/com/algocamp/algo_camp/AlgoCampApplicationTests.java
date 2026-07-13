@@ -1,6 +1,7 @@
 package com.algocamp.algo_camp;
 
 import com.algocamp.algorithm.impl.DijkstraStepper;
+import com.algocamp.algorithm.impl.TopologicalSortStepper;
 import com.algocamp.controller.dto.EdgeRequest;
 import com.algocamp.controller.dto.GraphAlgorithmRequest;
 import com.algocamp.domain.Graph;
@@ -19,15 +20,17 @@ class AlgoCampApplicationTests {
 
     @Test
     void testBuildGraph() {
-        Graph graph = new Graph(false);
-        graph.addWeightedEdge("A", "B", 4);
-        graph.addWeightedEdge("A", "C", 2);
-        graph.addWeightedEdge("B", "D", 5);
-        graph.addWeightedEdge("C", "D", 1);
+        Graph graph = new Graph(true);
+        graph.addEdge("A", "B");
+        graph.addEdge("A", "C");
+        graph.addEdge("B", "D");
+        graph.addEdge("C", "D");
 
-        DijkstraStepper dijkstra = new DijkstraStepper();
-        for (StepState step : dijkstra.executeStepByStep(graph, "A")) {
+        TopologicalSortStepper topo = new TopologicalSortStepper();
+        for (StepState step : topo.executeStepByStep(graph, "A")) {
             System.out.println(step);
         }
+
+
     }
 }

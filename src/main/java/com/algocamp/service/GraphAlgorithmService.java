@@ -9,6 +9,7 @@ import com.algocamp.domain.Graph;
 import com.algocamp.domain.StepState;
 import com.algocamp.algorithm.impl.DfsStepper;
 import com.algocamp.algorithm.impl.DijkstraStepper;
+import com.algocamp.algorithm.impl.TopologicalSortStepper;
 import org.springframework.stereotype.Service;
 
 import java.util.EnumMap;
@@ -42,6 +43,7 @@ public class GraphAlgorithmService {
         stepperRegistry.put(AlgorithmType.BFS, new BfsStepper());
         stepperRegistry.put(AlgorithmType.DFS, new DfsStepper());
         stepperRegistry.put(AlgorithmType.DIJKSTRA, new DijkstraStepper());
+        stepperRegistry.put(AlgorithmType.TOPOLOGICAL_SORT, new TopologicalSortStepper());
     }
 
     /**

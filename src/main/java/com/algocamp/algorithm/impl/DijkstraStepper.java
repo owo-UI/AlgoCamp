@@ -243,6 +243,7 @@ public class DijkstraStepper implements AlgorithmStepper {
                 Collections.emptyList(),   // DFS 栈
                 snapshotDistances(distances),
                 snapshotPriorityQueue(priorityQueue, distances),
+                Collections.emptyMap(),    // 拓扑排序入度表
                 finished
         );
     }
