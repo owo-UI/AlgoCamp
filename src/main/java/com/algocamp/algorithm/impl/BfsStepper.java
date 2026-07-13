@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.Collections;
 
 /**
  * 广度优先搜索（BFS）算法的步进实现类。
@@ -179,6 +180,7 @@ private StepState buildStepState(int stepNumber,
             currentVertex,
             new ArrayList<>(processedVertices),
             snapshotQueue(queue),
+            Collections.emptyList(),   // BFS 不使用栈，传空列表
             finished
     );
 }

@@ -7,6 +7,7 @@ import com.algocamp.common.Result;
 import com.algocamp.common.ResultCode;
 import com.algocamp.domain.Graph;
 import com.algocamp.domain.StepState;
+import com.algocamp.algorithm.impl.DfsStepper;
 import org.springframework.stereotype.Service;
 
 import java.util.EnumMap;
@@ -34,13 +35,11 @@ public class GraphAlgorithmService {
 
     /**
      * 构造方法：注册当前已实现的所有算法。
-     * 后续新增 DFS、Dijkstra 等算法时，在此处添加一行注册即可。
      */
     public GraphAlgorithmService() {
         stepperRegistry = new EnumMap<>(AlgorithmType.class);
         stepperRegistry.put(AlgorithmType.BFS, new BfsStepper());
-        // 后续扩展示例：
-        // stepperRegistry.put(AlgorithmType.DFS, new DfsStepper());
+        stepperRegistry.put(AlgorithmType.DFS, new DfsStepper());
     }
 
     /**

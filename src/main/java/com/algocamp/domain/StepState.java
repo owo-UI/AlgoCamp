@@ -9,7 +9,8 @@ import java.util.List;
  * 图算法步进执行时，某一步的完整内部状态快照。
  * <p>
  * 用于算法工坊的前端步进可视化：前端根据本对象渲染
- * 「当前节点」「已访问节点」「BFS 队列」等信息。
+ * 「当前节点」「已访问节点」「BFS 队列」或「DFS 栈」等信息。
+ * BFS 使用 {@link #queueContents}，DFS 使用 {@link #stackContents}，未使用的字段为空列表。
  * </p>
  *
  * @author AlgoCamp
@@ -39,28 +40,36 @@ public class StepState {
     private final List<String> queueContents;
 
     /**
-     * 本步之后算法是否已结束（队列为空且无可处理节点）。
+     * DFS 栈在本步的快照，栈底在列表最前，栈顶在最后。
+     * BFS 算法不使用本字段，值为空列表。
+     */
+    private final List<String> stackContents;
+
+    /**
+     * 本步之后算法是否已结束（队列/栈为空且无可处理节点）。
      */
     private final boolean finished;
 
     /**
      * 构造一步的完整状态快照。
-     *
      * @param stepNumber      步序号，从 0 开始
      * @param currentVertex   当前节点 ID，可为 null
      * @param visitedVertices 已访问节点列表，可为 null（视为空列表）
-     * @param queueContents   队列内容列表，可为 null（视为空列表）
+     * @param queueContents   BFS 队列内容，可为 null（视为空列表）
+     * @param stackContents   DFS 栈内容，可 为 null（视为空列表）
      * @param finished        是否为结束步
      */
     public StepState(int stepNumber,
-                     String currentVertex,
-                     List<String> visitedVertices,
-                     List<String> queueContents,
-                     boolean finished) {
+                 String currentVertex,
+                 List<String> visitedVertices,
+                 List<String> queueContents,
+                 List<String> stackContents,
+                 boolean finished) {
         this.stepNumber = stepNumber;
         this.currentVertex = currentVertex;
         this.visitedVertices = copyToUnmodifiableList(visitedVertices);
         this.queueContents = copyToUnmodifiableList(queueContents);
+        this.stackContents = copyToUnmodifiableList(stackContents);
         this.finished = finished;
     }
 
@@ -99,6 +108,14 @@ public class StepState {
     public List<String> getQueueContents() {
         return queueContents;
     }
+    /**
+     * 获取 DFS 栈快照（栈底在前，栈顶在后）。
+     *
+     * @return 不可变的栈内容列表
+     */
+    public List<String> getStackContents() {
+        return stackContents;
+    }
 
     /**
      * 判断本步是否为算法的最后一步。
@@ -129,6 +146,7 @@ public class StepState {
                 + ", currentVertex='" + currentVertex + '\''
                 + ", visitedVertices=" + visitedVertices
                 + ", queueContents=" + queueContents
+                + ", stackContents=" + stackContents
                 + ", finished=" + finished
                 + '}';
     }
