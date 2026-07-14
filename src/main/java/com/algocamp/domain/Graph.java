@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * 图的邻接表表示。
  * <p>
- * 用于算法工坊中存储用户创建的图结构，供 BFS、DFS 等图算法读取。
+ * 用于算法工坊中存储用户创建的图结构，供 BFS、DFS 等图算法读取。以及 Prim / Kruskal 最小生成树
  * 节点以字符串 ID 标识（如 "A"、"B"），便于前端可视化展示。
  * </p>
  *
@@ -148,6 +148,30 @@ public class Graph {
     }
 
     /**
+     * 获取图中所有无向带权边（已去重）。
+     * <p>
+     * 无向图的邻接表中每条边会双向存储，本方法只保留一端字典序更小的表示，
+     * 避免同一条边出现两次。主要用于 Kruskal / Prim 等最小生成树算法。
+     * </p>
+     *
+     * @return 不可变的无向边列表；若图为空则返回空列表
+     */
+    public List<MstEdge> getAllUndirectedEdges() {
+        List<MstEdge> undirectedEdges = new ArrayList<>();
+        for (Map.Entry<String, List<WeightedEdge>> entry : adjacencyList.entrySet()) {
+            String from = entry.getKey();
+            for (WeightedEdge weightedEdge : entry.getValue()) {
+                String to = weightedEdge.getTo();
+                // 只保留 from 字典序小于 to 的边，实现去重
+                if (from.compareTo(to) < 0) {
+                    undirectedEdges.add(new MstEdge(from, to, weightedEdge.getWeight()));
+                }
+            }
+        }
+        return Collections.unmodifiableList(undirectedEdges);
+    }
+
+    /**
      * 获取图中所有节点 ID。
      *
      * @return 不可变的节点 ID 集合
@@ -218,22 +242,5 @@ public class Graph {
     }
 
 
-
-//    /**
-//     * 测试的main函数
-//     * @param args
-//     */
-//     public static void main(String[] args) {
-//         Graph graph = new Graph(false);
-//         graph.addWeightedEdge("A", "B", 4);
-//         graph.addWeightedEdge("A", "C", 2);
-//         graph.addWeightedEdge("B", "D", 5);
-//         graph.addEdge("C", "D");  // 默认权重 1
-//
-//         System.out.println(graph.getNeighbors("A"));              // [B, C]
-//         System.out.println(graph.getWeightedNeighbors("A"));      // [B(4), C(2)]
-//         System.out.println(graph.getEdgeWeight("A", "B"));          // 4
-//         System.out.println(graph.getEdgeWeight("C", "D"));          // 1
-//    }
 
 }

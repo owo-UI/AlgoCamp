@@ -178,6 +178,8 @@ private StepState buildStepState(int stepNumber,
             Collections.emptyMap(),    // Dijkstra 距离表
             Collections.emptyList(),   // Dijkstra 优先队列
             Collections.emptyMap(),    // 拓扑排序入度表
+            Collections.emptyList(),   // MST 已选边
+            Collections.emptyList(),   // MST 候选边
             finished
     );
 }

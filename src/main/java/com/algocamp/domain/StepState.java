@@ -16,6 +16,7 @@ import java.util.HashMap;
  *   <li>DFS — {@link #stackContents}</li>
  *   <li>Dijkstra — {@link #distances} + {@link #priorityQueueContents}</li>
  *   <li>拓扑排序 — {@link #inDegrees} + {@link #queueContents}</li>
+ *   <li>Prim / Kruskal — {@link #mstEdges} + {@link #candidateEdges}</li>
  * </ul>
  * 未使用的字段为空列表或空 Map。
  * </p>
@@ -76,6 +77,8 @@ public class StepState {
                      Map<String, Integer> distances,
                      List<String> priorityQueueContents,
                      Map<String, Integer> inDegrees,
+                     List<MstEdge> mstEdges,
+                     List<MstEdge> candidateEdges,
                      boolean finished) {
         this.stepNumber = stepNumber;
         this.currentVertex = currentVertex;
@@ -85,6 +88,8 @@ public class StepState {
         this.distances = copyToUnmodifiableMap(distances);
         this.priorityQueueContents = copyToUnmodifiableList(priorityQueueContents);
         this.inDegrees = copyToUnmodifiableMap(inDegrees);
+        this.mstEdges = copyToUnmodifiableMstEdgeList(mstEdges);
+        this.candidateEdges = copyToUnmodifiableMstEdgeList(candidateEdges);
         this.finished = finished;
     }
 
@@ -160,6 +165,25 @@ public class StepState {
     }
 
     /**
+     * 获取已选入最小生成树的边列表。
+     *
+     * @return 不可变的 MST 边列表
+     */
+    public List<MstEdge> getMstEdges() {
+        return mstEdges;
+    }
+
+    /**
+     * 获取候选边列表快照。
+     *
+     * @return 不可变的候选边列表
+     */
+    public List<MstEdge> getCandidateEdges() {
+        return candidateEdges;
+    }
+
+
+    /**
      * Dijkstra 算法中，各节点截至本步的已知最短距离。
      * key 为节点 ID，value 为距离值。
      * BFS、DFS 不使用本字段，值为空 Map。
@@ -180,6 +204,18 @@ public class StepState {
      * 其他算法不使用本字段，值为空 Map。
      */
     private final Map<String, Integer> inDegrees;
+
+    /**
+     * 最小生成树算法中，截至本步已选入 MST 的边列表。
+     * 其他算法不使用本字段，值为空列表。
+     */
+    private final List<MstEdge> mstEdges;
+
+    /**
+     * Prim 算法中候选边（横切边）快照，按权重从小到大排列。
+     * Kruskal 可用来展示尚未处理的边；其他算法为空列表。
+     */
+    private final List<MstEdge> candidateEdges;
 
     /**
      * 判断本步是否为算法的最后一步。
@@ -216,6 +252,19 @@ public class StepState {
         return Collections.unmodifiableMap(new HashMap<>(source));
     }
 
+    /**
+     * 将传入的 MST 边列表拷贝为不可变列表。
+     *
+     * @param source 源列表，可为 null
+     * @return 不可变列表副本；source 为 null 时返回空列表
+     */
+    private static List<MstEdge> copyToUnmodifiableMstEdgeList(List<MstEdge> source) {
+        if (source == null) {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(new ArrayList<>(source));
+    }
+
     @Override
     public String toString() {
         return "StepState{"
@@ -227,6 +276,8 @@ public class StepState {
                 + ", distances=" + distances
                 + ", priorityQueueContents=" + priorityQueueContents
                 + ", inDegrees=" + inDegrees
+                + ", mstEdges=" + mstEdges
+                + ", candidateEdges=" + candidateEdges
                 + ", finished=" + finished
                 + '}';
     }

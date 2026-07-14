@@ -244,6 +244,8 @@ public class DijkstraStepper implements AlgorithmStepper {
                 snapshotDistances(distances),
                 snapshotPriorityQueue(priorityQueue, distances),
                 Collections.emptyMap(),    // 拓扑排序入度表
+                Collections.emptyList(),   // MST 已选边
+                Collections.emptyList(),   // MST 候选边
                 finished
         );
     }

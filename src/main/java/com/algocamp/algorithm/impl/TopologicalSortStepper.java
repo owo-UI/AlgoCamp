@@ -221,6 +221,8 @@ public class TopologicalSortStepper implements AlgorithmStepper {
                 Collections.emptyMap(),    // Dijkstra 距离表
                 Collections.emptyList(),   // Dijkstra 优先队列
                 snapshotInDegrees(inDegrees),
+                Collections.emptyList(),   // MST 已选边
+                Collections.emptyList(),   // MST 候选边
                 finished
         );
     }

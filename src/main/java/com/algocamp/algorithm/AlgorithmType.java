@@ -22,7 +22,13 @@ public enum AlgorithmType {
     DIJKSTRA("DIJKSTRA", "Dijkstra 最短路径"),
 
     /** 拓扑排序（Topological Sort），仅适用于有向无环图 */
-    TOPOLOGICAL_SORT("TOPOLOGICAL_SORT", "拓扑排序");
+    TOPOLOGICAL_SORT("TOPOLOGICAL_SORT", "拓扑排序"),
+
+    /** Prim 最小生成树算法 */
+    PRIM("PRIM", "Prim 最小生成树"),
+
+    /** Kruskal 最小生成树算法 */
+    KRUSKAL("KRUSKAL", "Kruskal 最小生成树");
 
     /**
      * 算法代码，用于 API 传参（如 ?algorithm=BFS）。
